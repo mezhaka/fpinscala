@@ -1,6 +1,24 @@
 [![Build status](https://travis-ci.org/fpinscala/fpinscala.svg?branch=master)](https://travis-ci.org/fpinscala/fpinscala) [![Join the chat at https://gitter.im/fpinscala/fpinscala](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/fpinscala/fpinscala?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
 
-This repository contains exercises, hints, and answers for the book
+== Set up
+Run the following from the root of fpinscala git repo.  This would create a named `fpinscala` container and mount the current directory into the container:
+```
+docker create -it --name fpinscala -v $PWD:/app --workdir /app openjdk:8
+```
+Start the container:
+```
+docker start fpinscala
+```
+Run bash in the container and attach to it:
+```
+docker exec -it fpinscala bash
+```
+Then I was able to follow what README.md suggest, that is, run `./sbt`, select project, and compile.  If you then exit it with Ctrl-D, you can re-attach with 
+```
+docker container attach fpinscala
+```
+
+== This repository contains exercises, hints, and answers for the book
 [Functional Programming in Scala](http://manning.com/bjarnason/). Along
 with the book itself, it's the closest you'll get to having your own
 private functional programming tutor without actually having one.

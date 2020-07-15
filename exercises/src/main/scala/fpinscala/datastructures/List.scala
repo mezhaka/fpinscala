@@ -214,6 +214,66 @@ object List { // `List` companion object. Contains functions for creating and wo
     List(buf.toList: _*)
   }
 
+  @annotation.tailrec
+  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = {
+    @annotation.tailrec
+    def go[A](sup: List[A], sub: List[A]): Boolean = (sup, sub) match {
+      case (_, Nil) => true
+      case (Nil, Cons(_, _)) => false
+      case (Cons(hl, tl), Cons(hr, tr)) => (hl == hr) && go(tl, tr)
+    }
+    sup match {
+      case Cons(_, t) => go(sup, sub) || hasSubsequence(t, sub)
+      case Nil => go(sup, sub)
+    }
+  }
+
+  // I get compilation error here -- it's not tailrec and I don't get why.
+  // @annotation.tailrec 
+  def hasSubsequence2[A](sup: List[A], sub: List[A]): Boolean = {
+    @annotation.tailrec
+    def go[A](sup: List[A], sub: List[A], c: () => Boolean ): Boolean =
+      (sup, sub) match {
+        case (_, Nil) => true
+        case (Nil, Cons(_, _)) => c()
+        case (Cons(hl, tl), Cons(hr, tr)) => {
+          if (hl != hr) c()
+          else go(tl, tr, c)
+        }
+    }
+    sup match {
+      case Cons(h, t) => go(sup, sub, () => hasSubsequence2(t, sub))
+      case Nil => go(sup, sub, () => false)
+    }
+  }
+
+  def hasSubsequence3[A](sup: List[A], sub: List[A]): Boolean = {
+    println(s"hs $sup  --  $sub")
+    @annotation.tailrec
+    def go[A](sup: List[A], sub: List[A], c: () => Boolean ): Boolean = {
+      println("go")
+      (sup, sub) match {
+        case (_, Nil) => true
+        case (Nil, Cons(_, _)) => c()
+        case (Cons(hl, tl), Cons(hr, tr)) => {
+          if (hl != hr) c()
+          else go(tl, tr, c)
+        }
+    }
+    }
+    sup match {
+      case Cons(h, t) => {
+        println("1")
+        go(sup, sub, () => {
+          println("2")
+          hasSubsequence2(t, sub)
+        })
+      }
+      case Nil => go(sup, sub, () => false)
+    }
+  }
+
+
 }
 
 
@@ -283,12 +343,26 @@ object Main {
     test(List.add1(List(1, 2)), List(2, 3))
     println(List.toStr(List(1.0, 2.0)))
     test(List.toStr(List(1.0, 2.0)), List("1.0", "2.0"))
-    
+
     test(List.filter(List(1, 2, 3, 4))(_ % 2 == 0), List(2, 4))
     test(List.filter2(List(1, 2, 3, 4))(_ % 2 == 0), List(2, 4))
     test(List.flatMap(List(1,2,3))(i => List(i,i)), List(1, 1, 2, 2, 3, 3))
     test(List.filter3(List(1, 2, 3, 4))(_ % 2 == 0), List(2, 4))
     test(List.zipWith(List(1, 2), List(3, 4))(_ + _), List(4, 6))
     test(List.zipWith2(List(1, 2), List(3, 4))(_ + _), List(4, 6))
+
+    def testSubsequence(f: (List[Int], List[Int]) => Boolean): Unit = {
+      test(f(List(1, 2, 3, 4), List(2, 3)), true)
+      test(f(List(1, 2, 3, 4), List(3, 4)), true)
+      test(f(List(1, 2, 3, 4), List(1, 2)), true)
+      test(f(List(1, 2, 3, 4), List(1)), true)
+      test(f(List(1, 2, 3, 4), List(4)), true)
+      test(f(List(1, 2, 3, 4), Nil), true)
+      test(f(Nil, Nil), true)
+      test(f(Nil, List(1)), false)
+      test(f(List(1, 2, 3, 4), List(1, 2, 3, 4, 5)), false)
+    }
+    testSubsequence(List.hasSubsequence)
+    testSubsequence(List.hasSubsequence2)
   }
 }

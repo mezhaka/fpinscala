@@ -364,5 +364,25 @@ object Main {
     }
     testSubsequence(List.hasSubsequence)
     testSubsequence(List.hasSubsequence2)
+
+    val t = Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))
+    def testSize(f: Tree[Int] => Int): Unit = {
+      println("Test Tree.size")
+      test(Tree.size(Leaf(1)), 1)
+      test(Tree.size(t), 5)
+    }
+    testSize(Tree.size)
+    testSize(Tree.size2)
+
+    test(Tree.maximum(t), 3)
+    test(Tree.maximum2(t), 3)
+
+    test(Tree.depth(Leaf(1)), 1)
+    test(Tree.depth(t), 3)
+    test(Tree.depth2(Leaf(1)), 1)
+    test(Tree.depth2(t), 3)
+
+    test(Tree.map(t)(_ + 0), t)
+    test(Tree.map2(t)(_ + 0), t)
   }
 }
